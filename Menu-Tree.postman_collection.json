@@ -1,0 +1,140 @@
+{
+	"info": {
+		"_postman_id": "30beb007-836d-4b76-82d7-77aa9c0c7e1e",
+		"name": "Menu-Tree",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15708583"
+	},
+	"item": [
+		{
+			"name": "Menus",
+			"item": [
+				{
+					"name": "get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/menus",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"menus"
+							]
+						},
+						"description": "`GET /api/menus`\n\nResponse Example :\n\n\\[  \n{  \n\"id\": \"b3b9b55a-3e0f-4b43-9307-cc4b9fa8e733\",  \n\"name\": \"System Management\",  \n\"parent_id\": null,  \n\"depth\": 0,  \n\"order\": 0,  \n\"is_active\": 1,  \n\"children\": \\[  \n{  \n\"id\": \"a02a8e7f-9d14-4045-8dc6-2556a5dbd666\",  \n\"name\": \"System Management\",  \n\"parent_id\": \"b3b9b55a-3e0f-4b43-9307-cc4b9fa8e733\",  \n\"children\": \\[  \n{  \n\"id\": \"a02a8ee9-76df-472d-97c6-0d0ef00806b3\",  \n\"name\": \"System\",  \n\"children\": \\[\\]  \n}  \n\\]  \n}  \n\\]  \n}  \n\\]"
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"name\": \"New Menu\",\r\n\"parent_id\": \"a02a8ee9-76df-472d-97c6-0d0ef00806b3\",\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/menus",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"menus"
+							]
+						},
+						"description": "POST api/menus\n\nResponse Example :\n\n{  \n\"message\": \"Menu created successfully\",  \n\"data\": {  \n\"id\": \"af19b55a-3e0f-4b43-9307-cc4b9fa8e799\",  \n\"name\": \"New Menu\",  \n\"parent_id\": \"a02a8ee9-76df-472d-97c6-0d0ef00806b3\",  \n\"depth\": 3,  \n\"order\": 0,  \n\"is_active\": 1  \n}  \n}"
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/menus/{id}",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"menus",
+								"{id}"
+							]
+						},
+						"description": "DELETE api/menus{id}\n\nResponse Example :\n\n{  \n\"message\": \"Menu deleted successfully\"  \n}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Update",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Updated Menu Name\",\r\n  \"is_active\": 1\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/menus/{id}",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"menus",
+						"{id}"
+					]
+				},
+				"description": "PUT api/menus/{id}\n\nResponse Example :\n\n{  \n\"message\": \"Menu updated successfully\",  \n\"data\": {  \n\"id\": \"a02a8ee9-76df-472d-97c6-0d0ef00806b3\",  \n\"name\": \"Updated Menu Name\",  \n\"is_active\": 1  \n}  \n}"
+			},
+			"response": []
+		}
+	]
+}

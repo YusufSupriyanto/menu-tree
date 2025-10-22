@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "@inertiajs/react";
 import { Menu as MenuIcon, X, Folder } from "lucide-react";
 import MenuSidebar from "@/Components/MenuSidebar";
@@ -13,11 +13,18 @@ export default function Index({ menus: initialMenus }) {
     parent_id: "",
   });
 
-  console.log(menuState); // perbaikan
-
+   
   const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedMenuId, setSelectedMenuId] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
+
+   useEffect(() => {
+    if (selectedMenuId) {
+        const updatedNode = findNodeById(menuState, selectedMenuId);
+        setSelectedNode(updatedNode);
+    }
+    }, [menuState, selectedMenuId]);
+
 
   // Fungsi rekursif untuk mencari node berdasarkan id
   const findNodeById = (data, id) => {
