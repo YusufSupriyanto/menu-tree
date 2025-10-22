@@ -8,37 +8,45 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
+import { Link, usePage } from "@inertiajs/react"; // Import Link dari Inertia
 import logo from "@/assets/logo.png";
 
 export default function MenuSidebar() {
-  const [activeMenu, setActiveMenu] = useState("Menus");
   const [collapsed, setCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+
+  // Ambil URL aktif dari Inertia
+  const { url } = usePage();
 
   const menus = [
     {
       title: "Systems",
       icon: <Folder size={18} />,
       children: [
-        { title: "System Code", icon: <LayoutGrid size={16} /> },
-        { title: "Properties", icon: <LayoutGrid size={16} /> },
-        { title: "Menus", icon: <LayoutGrid size={16} /> },
-        { title: "API List", icon: <Network size={16} /> },
+        { title: "System Code", icon: <LayoutGrid size={16} />, link: "/systems/code" },
+        { title: "Properties", icon: <LayoutGrid size={16} />, link: "/systems/properties" },
+        { title: "Menus", icon: <LayoutGrid size={16} />, link: "/menus" },
+        { title: "API List", icon: <Network size={16} />, link: "/systems/apis" },
       ],
     },
     {
       title: "Users & Group",
       icon: <Users size={18} />,
+      link: "/users",
     },
     {
       title: "Competition",
       icon: <Folder size={18} />,
+      link: "/competition",
     },
   ];
 
   const toggleDropdown = (menuTitle) => {
     setOpenDropdown(openDropdown === menuTitle ? null : menuTitle);
   };
+
+  // Fungsi bantu untuk cek apakah menu aktif
+  const isActive = (path) => url.startsWith(path);
 
   return (
     <aside
@@ -64,33 +72,47 @@ export default function MenuSidebar() {
         {menus.map((menu) => (
           <div key={menu.title}>
             {/* Main Menu */}
-            <button
-              onClick={() =>
-                menu.children
-                  ? toggleDropdown(menu.title)
-                  : setActiveMenu(menu.title)
-              }
-              className={`flex items-center justify-between w-full text-sm font-semibold px-2 py-2 rounded-lg transition-all duration-200
-                ${
-                  activeMenu === menu.title
-                    ? "bg-blue-600 text-white"
-                    : "text-blue-100 hover:bg-blue-700"
-                }`}
-            >
-              <div className="flex items-center gap-2">
-                {menu.icon}
-                {!collapsed && <span>{menu.title}</span>}
-              </div>
-              {!collapsed && menu.children && (
-                <span>
-                  {openDropdown === menu.title ? (
-                    <ChevronDown size={16} />
-                  ) : (
-                    <ChevronRight size={16} />
-                  )}
-                </span>
-              )}
-            </button>
+            {menu.children ? (
+              <button
+                onClick={() => toggleDropdown(menu.title)}
+                className={`flex items-center justify-between w-full text-sm font-semibold px-2 py-2 rounded-lg transition-all duration-200
+                  ${
+                    openDropdown === menu.title
+                      ? "bg-blue-600 text-white"
+                      : "text-blue-100 hover:bg-blue-700"
+                  }`}
+              >
+                <div className="flex items-center gap-2">
+                  {menu.icon}
+                  {!collapsed && <span>{menu.title}</span>}
+                </div>
+                {!collapsed && (
+                  <span>
+                    {openDropdown === menu.title ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    )}
+                  </span>
+                )}
+              </button>
+            ) : (
+              //jika tidak punya children, jadikan link
+              <Link
+                href={menu.link}
+                className={`flex items-center w-full text-sm font-semibold px-2 py-2 rounded-lg transition-all duration-200
+                  ${
+                    isActive(menu.link)
+                      ? "bg-blue-600 text-white"
+                      : "text-blue-100 hover:bg-blue-700"
+                  }`}
+              >
+                <div className="flex items-center gap-2">
+                  {menu.icon}
+                  {!collapsed && <span>{menu.title}</span>}
+                </div>
+              </Link>
+            )}
 
             {/* Submenus */}
             {!collapsed && menu.children && (
@@ -102,12 +124,12 @@ export default function MenuSidebar() {
                 }`}
               >
                 {menu.children.map((child) => (
-                  <button
+                  <Link
                     key={child.title}
-                    onClick={() => setActiveMenu(child.title)}
+                    href={child.link}
                     className={`flex items-center gap-2 w-full px-2 py-1 rounded-lg text-sm transition-all duration-200
                       ${
-                        activeMenu === child.title
+                        isActive(child.link)
                           ? "bg-blue-600 text-white"
                           : "text-blue-100 hover:bg-blue-700 hover:text-white"
                       }`}
@@ -116,7 +138,7 @@ export default function MenuSidebar() {
                       {child.icon}
                       {!collapsed && <span>{child.title}</span>}
                     </div>
-                  </button>
+                  </Link>
                 ))}
               </div>
             )}

@@ -83,9 +83,9 @@ export default function Index({ menus }) {
   };
 
   return (
-    <div className="h-screen flex flex-col md:flex-row bg-gray-100">
+    <div className="h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
-      <div className="hidden md:block p-3">
+      <div className="hidden md:block p-2">
         <MenuSidebar />
       </div>
 

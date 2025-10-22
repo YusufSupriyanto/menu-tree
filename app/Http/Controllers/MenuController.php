@@ -28,7 +28,6 @@ class MenuController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'parent_id' => 'nullable|uuid|exists:menus,id',
-            'depth' => 'required|integer'
         ]);
 
 
