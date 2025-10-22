@@ -25,7 +25,6 @@ Setiap menu dapat memiliki sub-menu (children), mendukung operasi **create**, **
 | Frontend | React + Inertia.js |
 | Styling | Tailwind CSS |
 | Icons | Lucide React |
-| State & Form Handling | Inertia useForm Hook |
 | Database | MySQL |
 
 ---
