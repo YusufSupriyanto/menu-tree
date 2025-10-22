@@ -4,13 +4,16 @@ import { Menu as MenuIcon, X, Folder } from "lucide-react";
 import MenuSidebar from "@/Components/MenuSidebar";
 import MenuTree from "@/Components/MenuTree";
 import { router } from "@inertiajs/react";
+import axios from "axios"; // <- pastikan import axios
 
-export default function Index({ menus }) {
+export default function Index({ menus: initialMenus }) {
+  const [menuState, setMenuState] = useState(initialMenus || []);
   const { data, setData, post, reset } = useForm({
     name: "",
     parent_id: "",
   });
-  console.log(menus);
+
+  console.log(menuState); // perbaikan
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedMenuId, setSelectedMenuId] = useState(null);
@@ -19,7 +22,7 @@ export default function Index({ menus }) {
   // Fungsi rekursif untuk mencari node berdasarkan id
   const findNodeById = (data, id) => {
     for (const item of data) {
-      if (item.id === id) return item;
+      if (String(item.id) === String(id)) return item;
       if (item.children && item.children.length) {
         const found = findNodeById(item.children, id);
         if (found) return found;
@@ -41,45 +44,103 @@ export default function Index({ menus }) {
   const handleSelectChange = (e) => {
     const id = e.target.value;
     setSelectedMenuId(id);
-    const node = findNodeById(menus, id);
+    const node = findNodeById(menuState, id); 
     setSelectedNode(node);
   };
 
-  const handleCreate = (parent, values) => {
-    router.post("/menus", values, {
-      onSuccess: () => {
-        setData({ name: values.name, parent_id: parent.id });
+  
+  const handleCreate = async (parent, values) => {
+    try {
+      const response = await axios.post("/menus", values);
+      
+      if (response.data && response.data.success) {
+        const newMenu = response.data.menu;
+
+        setMenuState((prev) => {
+          if (!newMenu.parent_id) {
+            return [...prev, { ...newMenu, children: [] }];
+          }
+
+          const updateChildren = (nodes) =>
+            nodes.map((node) => {
+              if (String(node.id) === String(newMenu.parent_id)) {
+                return {
+                  ...node,
+                  children: [...(node.children || []), { ...newMenu, children: [] }],
+                };
+              }
+              if (node.children) {
+                return { ...node, children: updateChildren(node.children) };
+              }
+              return node;
+            });
+
+          return updateChildren(prev);
+        });
+
         alert("Menu berhasil dibuat!");
-      },
-      onError: (errors) => {
-        console.error(errors);
+      } else {
+        console.error("Unexpected response:", response);
         alert("Gagal membuat menu!");
-      },
-    });
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Gagal membuat menu!");
+    }
   };
 
-  const handleEdit = (node, values) => {
-    router.put(`/menus/${node.id}`, values, {
-      onSuccess: () => {
+  const handleEdit = async (node, values) => {
+    try {
+      const response = await axios.put(`/menus/${node.id}`, values);
+      if (response.data && response.data.success) {
+        const updatedMenu = response.data.menu;
+        setMenuState((prev) => {
+          const updateNode = (nodes) =>
+            nodes.map((n) => {
+              if (String(n.id) === String(updatedMenu.id)) {
+                return { ...n, ...updatedMenu };
+              }
+              if (n.children) {
+                return { ...n, children: updateNode(n.children) };
+              }
+              return n;
+            });
+          return updateNode(prev);
+        });
         alert("Menu berhasil diperbarui!");
-      },
-      onError: (errors) => {
-        console.error(errors);
+      } else {
         alert("Gagal memperbarui menu!");
-      },
-    });
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Gagal memperbarui menu!");
+    }
   };
 
-  const handleDelete = (node) => {
-    router.delete(`/menus/${node.id}`, {
-      onSuccess: () => {
+  const handleDelete = async (node) => {
+    if (!confirm("Yakin ingin menghapus menu ini?")) return;
+
+    try {
+      const response = await axios.delete(`/menus/${node.id}`);
+      if (response.data && response.data.success) {
+        setMenuState((prev) => {
+          const removeNode = (nodes) =>
+            nodes
+              .filter((n) => String(n.id) !== String(node.id))
+              .map((n) => ({
+                ...n,
+                children: n.children ? removeNode(n.children) : [],
+              }));
+          return removeNode(prev);
+        });
         alert("Menu berhasil dihapus!");
-      },
-      onError: (errors) => {
-        console.error(errors);
+      } else {
         alert("Gagal menghapus menu!");
-      },
-    });
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Gagal menghapus menu!");
+    }
   };
 
   return (
@@ -126,7 +187,6 @@ export default function Index({ menus }) {
             <span className="font-medium">/ Menus</span>
           </div>
 
-          {/* Dropdown untuk pilih menu */}
           <div className="mb-4">
             <select
               value={selectedMenuId || ""}
@@ -134,13 +194,12 @@ export default function Index({ menus }) {
               className="border p-2 rounded w-full"
             >
               <option value="">-- Select Menu --</option>
-              {renderOptions(menus)}
+              {renderOptions(menuState)}
             </select>
           </div>
 
-          {/* Tampilkan node yang dipilih beserta children */}
           <MenuTree
-            data={selectedNode ? [selectedNode] : menus}
+            data={selectedNode ? [selectedNode] : menuState}
             onCreate={handleCreate}
             onEdit={handleEdit}
             onDelete={handleDelete}

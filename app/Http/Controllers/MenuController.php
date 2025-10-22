@@ -32,11 +32,13 @@ class MenuController extends Controller
 
 
         try {
+            $menu = $this->service->createMenu($data);
 
-            $this->service->createMenu($data);
+            if ($request->wantsJson()) {
+                return response()->json(['success' => true, 'menu' => $menu], 201);
+            }
             return redirect()->back()->with('success', 'Menu created successfully.');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
@@ -49,20 +51,31 @@ class MenuController extends Controller
 
         try {
 
-            $this->service->updateMenu($menu, $data);
+            $menu = $this->service->updateMenu($menu, $data);
+            if ($request->wantsJson()) {
+                return response()->json(['success' => true, 'menu' => $menu], 201);
+            }
             return redirect()->back()->with('success', 'Menu updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
-    public function delete(Menu $menu)
+    public function delete(Request $request, Menu $menu)
     {
         try {
-
             $this->service->deleteMenu($menu);
+
+            if ($request->wantsJson()) {
+                return response()->json(['success' => true], 200);
+            }
+
             return redirect()->back()->with('success', 'Menu deleted successfully.');
         } catch (\Exception $e) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            }
+
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
